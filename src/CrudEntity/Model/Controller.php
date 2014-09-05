@@ -20,7 +20,7 @@ class Controller
     /**
      * @var string
      */
-    private $path;
+    private $path = ".";
 
     /**
      * @var string
@@ -71,7 +71,7 @@ class Controller
      * @param  string $path   Caminho dos arquivos
      * @return void
      */
-    public function generate($name, $module, $path)
+    public function generate($name = null, $module = null, $path = null)
     {
         $this->setpath($path);
         $this->setModule($module);
@@ -106,6 +106,10 @@ class Controller
      */
     public function setName($name)
     {
+        if (empty($name)) {
+            return;
+        }
+
         if (file_exists($this->path."/module/" . $this->module."/src/" . $this->module. "/Controller/$name")) {
             throw new \Exception("O controller $name já existe no módulo " . $this->module);
         }
@@ -119,6 +123,10 @@ class Controller
      */
     public function setModule($module)
     {
+        if (empty($module)) {
+            return;
+        }
+
         if (!file_exists($this->path."/module") || !file_exists($this->path."/config/application.config.php")) {
             throw new \Exception("O diretório " . $this->path . " não é um módulo ZF2.");
         }
@@ -132,6 +140,10 @@ class Controller
      */
     public function setPath($path = ".")
     {
+        if (empty($path)) {
+            return;
+        }
+
         $this->path = $path;
     }
 }
