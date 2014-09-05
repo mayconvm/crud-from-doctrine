@@ -9,12 +9,8 @@ use ZFTool\Model\Skeleton;
 use ZFTool\Model\Utility;
 use Zend\Console\ColorInterface as Color;
 use Zend\Code\Generator;
-use Zend\Code\Reflection;
-use Zend\Filter\Word\CamelCaseToDash as CamelCaseToDashFilter;
-use ZFTool\Model\Auxiliares;
-use Zend\Code\Annotation\Parser;
-use ZFTool\Model\Auxiliares\Form as GeneratorForm;
-use ZFTool\Model\Auxiliares\Validate as GeneratorValidate;
+use CrudEntity\Model\Controller;
+use CrudEntity\Model\Config;
 
 class ApiRestController extends AbstractActionController
 {
@@ -28,10 +24,61 @@ class ApiRestController extends AbstractActionController
         $module  = $request->getParam('modulo');
         $path    = $request->getParam('path', '.');
 
-        // gerando o controller
-        $this->creatController($name, $module, $path);
-        
+        // generate controller
+        $modelController = new Model\Controller($name, $module, $path);
+
+        // add methods
+        // method get
+        $modelController->addMethod(
+            new Generator\MethodGenerator(
+                'get',
+                array(),
+                Generator\MethodGenerator::FLAG_PUBLIC,
+                'return new JsonModel();'
+            )
+        );
+
+        // method getList
+        $modelController->addMethod(
+            new Generator\MethodGenerator(
+                'getList',
+                array(),
+                Generator\MethodGenerator::FLAG_PUBLIC,
+                'return new JsonModel();'
+            )
+        );
+
+        // method create
+        $modelController->addMethod(
+            new Generator\MethodGenerator(
+                'create',
+                array(),
+                Generator\MethodGenerator::FLAG_PUBLIC,
+                'return new JsonModel();'
+            )
+        );
+
+        // method update
+        $modelController->addMethod(
+            new Generator\MethodGenerator(
+                'update',
+                array(),
+                Generator\MethodGenerator::FLAG_PUBLIC,
+                'return new JsonModel();'
+            )
+        );
+
+        // method delete
+        $modelController->addMethod(
+            new Generator\MethodGenerator(
+                'delete',
+                array(),
+                Generator\MethodGenerator::FLAG_PUBLIC,
+                'return new JsonModel();'
+            )
+        );
+
         // gerando o arquivo de configurações
-        $this->generateConfig($module, $path);
+        Model\Config::generateConfig($module, $path);
     }
 }
