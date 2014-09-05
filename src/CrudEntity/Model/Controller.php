@@ -106,8 +106,8 @@ class Controller
      */
     public function setName($name)
     {
-        if (file_exists("$path/module/$module/src/$module/Controller/$name")) {
-            throw new \Exception("O controller $name já existe no módulo $module.");
+        if (file_exists($this->path."/module/" . $this->module."/src/" . $this->module. "/Controller/$name")) {
+            throw new \Exception("O controller $name já existe no módulo " . $this->module);
         }
 
         $this->name = $name;
@@ -119,8 +119,8 @@ class Controller
      */
     public function setModule($module)
     {
-        if (!file_exists("$path/module") || !file_exists("$path/config/application.config.php")) {
-            throw new \Exception("No diretório $path não é um módulo ZF2.");
+        if (!file_exists($this->path."/module") || !file_exists($this->path."/config/application.config.php")) {
+            throw new \Exception("O diretório " . $this->path . " não é um módulo ZF2.");
         }
 
         $this->module = $module;
