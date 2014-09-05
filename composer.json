@@ -15,5 +15,9 @@
         "doctrine/dbal": "2.4.0-beta2",
         "doctrine/common": "2.4.0-rc2",
         "doctrine/doctrine-orm-module": "0.7.*",
-    }
+    },
+    "autoload": {
+        "psr-0": { "CrudEntity\\": "src/" }
+    },
+    "bin": ["bin/crud-entity", "bin/crud.php"]
 }
