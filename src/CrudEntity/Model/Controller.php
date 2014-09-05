@@ -71,7 +71,7 @@ class Controller
      * @param  string $path   Caminho dos arquivos
      * @return void
      */
-    public function creatController($name, $module, $path)
+    public function generate($name, $module, $path)
     {
         $this->setpath($path);
         $this->setModule($module);
