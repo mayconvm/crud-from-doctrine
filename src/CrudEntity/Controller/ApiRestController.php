@@ -9,8 +9,8 @@ use ZFTool\Model\Skeleton;
 use ZFTool\Model\Utility;
 use Zend\Console\ColorInterface as Color;
 use Zend\Code\Generator;
-use CrudEntity\Model\Controller;
-use CrudEntity\Model\Config;
+use CrudEntity\Model\Controller as ModelController;
+use CrudEntity\Model\Config as ModelConfig;
 
 class ApiRestController extends AbstractActionController
 {
@@ -25,7 +25,7 @@ class ApiRestController extends AbstractActionController
         $path    = $request->getParam('path', '.');
 
         // generate controller
-        $modelController = new Model\Controller($name, $module, $path);
+        $modelController = new ModelController($name, $module, $path);
 
         // add methods
         // method get
@@ -79,6 +79,6 @@ class ApiRestController extends AbstractActionController
         );
 
         // gerando o arquivo de configurações
-        Model\Config::generateConfig($module, $path);
+        ModelConfig::generateConfig($module, $path);
     }
 }
