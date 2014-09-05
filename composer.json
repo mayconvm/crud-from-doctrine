@@ -19,5 +19,5 @@
     "autoload": {
         "psr-0": { "CrudEntity\\": "src/" }
     },
-    "bin": ["bin/crud-entity", "bin/crud.php"]
+    "bin": ["bin/crud.php"]
 }
