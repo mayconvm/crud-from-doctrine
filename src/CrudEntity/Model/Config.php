@@ -29,6 +29,9 @@ EOD;
      */
     public static function generateConfig($module, $path)
     {
+        self::setPath($path);
+        self::setModule($module);
+
         // alterar o config.php do módulo adicionando
         copy("$path/module/$module/config/module.config.php", "$path/module/$module/config/module.config.old");
 
@@ -49,8 +52,8 @@ EOD;
      */
     public function generate($module, $path)
     {
-        $this->setPath($path);
-        $this->setModule($module);
+        self::setPath($path);
+        self::setModule($module);
 
         self::generateConfig($module, $path);
     }
@@ -59,7 +62,7 @@ EOD;
      * Method for set path
      * @param string $path path module
      */
-    public function setPath($path)
+    public static function setPath($path)
     {
         self::$path = $path;
     }
@@ -68,10 +71,10 @@ EOD;
      * Method for set name module
      * @param string $module name module
      */
-    public function setModule($module)
+    public static function setModule($module)
     {
         if (!is_file(self::$path . "/module/$module/config/module.config.php")) {
-            throw new \Exception("File for configuration no exist.", 1);
+            throw new \Exception("File configuration no exist.", 1);
         }
 
         self::$module = $module;
