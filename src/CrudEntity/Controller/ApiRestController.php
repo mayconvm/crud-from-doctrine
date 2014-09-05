@@ -78,6 +78,9 @@ class ApiRestController extends AbstractActionController
             )
         );
 
+        // generate class
+        $modelController->generate();
+
         // gerando o arquivo de configurações
         ModelConfig::generateConfig($module, $path);
     }
