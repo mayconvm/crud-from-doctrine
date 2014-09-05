@@ -9,6 +9,7 @@
     "homepage": "http://framework.zend.com/",
     "license": "MIT",
     "type": "library",
+    "installation-source": "dist",
     "autoload": {
         "psr-0": {
             "CrudEntity": "src/"
