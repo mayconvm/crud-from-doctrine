@@ -1,5 +1,5 @@
 {
-    "name": "mayconvm/crud-from-doctrine",
+    "name": "mayconvm/CrudEntity",
     "description": "Crud for generate form e validade ZF2",
     "license": "Apache",
     "keywords": [
@@ -17,7 +17,9 @@
         "doctrine/doctrine-orm-module": "0.7.*",
     },
     "autoload": {
-        "psr-0": { "CrudEntity\\": "src/" }
+        "psr-4": {
+            "CrudEntity\\": "src/"
+        }
     },
     "bin": ["bin/crud.php"]
 }
