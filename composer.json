@@ -8,6 +8,12 @@
     ],
     "homepage": "http://framework.zend.com/",
     "license": "MIT",
+    "type": "library",
+    "autoload": {
+        "psr-0": {
+            "CrudEntity\\": "src/"
+        }
+    },
     "repositories": [
         {
             "type":"package",
@@ -22,11 +28,6 @@
             }
         }
     ],
-    "autoload": {
-        "psr-0": {
-            "CrudEntity\\": "src/"
-        }
-    },
     "require": {
         "php": ">=5.3.3",
         "zendframework/zenddiagnostics" : ">=1.0.0",
@@ -48,7 +49,7 @@
         "doctrine/orm": "2.4.0-beta2",
         "doctrine/dbal": "2.4.0-beta2",
         "doctrine/common": "2.4.0-rc2",
-        "doctrine/doctrine-orm-module": "0.7.*",
+        "doctrine/doctrine-orm-module": "0.7.*"
     },
     "bin": ["bin/crud.php"]
 }
