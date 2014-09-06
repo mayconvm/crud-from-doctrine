@@ -106,6 +106,17 @@ class Controller
     }
 
     /**
+     * Method for add array methods
+     * @param array $methods Array of methods
+     */
+    public function addMethods(array $methods)
+    {
+        foreach ($methods as $method) {
+            $this->addMethod($method);
+        }
+    }
+
+    /**
      * Método para setar o nome do controller
      * @param string $name Nome
      */
@@ -159,5 +170,10 @@ class Controller
     public function isControllerExist()
     {
         return $this->fileExist;
+    }
+
+    public function getName()
+    {
+        return $this->name;
     }
 }
