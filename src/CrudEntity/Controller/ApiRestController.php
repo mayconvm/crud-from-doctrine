@@ -101,7 +101,7 @@ class ApiRestController extends AbstractActionController
         $console->write("Controller create success!\n", Color::GREEN);
 
         // gerando o arquivo de configurações
-        ModelConfig::generateConfig($module, $path);
+        ModelConfig::generateConfig($module, $name, false, $path);
         $console->write("Configuration file regenerate!\n", Color::GREEN);
     }
 }

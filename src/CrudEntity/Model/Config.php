@@ -24,10 +24,12 @@ EOD;
     /**
      * Método para adicionar os dados de configurações par APIRest
      * @param  string $module Nome do módulo
+     * @param  string $name   Name controller
+     * @param  booleand $view   Se deve criar a rota para view ou não
      * @param  string $path   Caminho do arquivos
      * @return void
      */
-    public static function generateConfig($module, $path)
+    public static function generateConfig($module, $name, $view = false, $path = ".")
     {
         self::setPath($path);
         self::setModule($module);
@@ -36,9 +38,56 @@ EOD;
         copy("$path/module/$module/config/module.config.php", "$path/module/$module/config/module.config.old");
 
         $moduleConfig = include "$path/module/$module/config/module.config.php";
-        $moduleConfig['view_manager']['strategies'] = array('ViewJsonStrategy');
-        $conteudo = self::$head;
 
+        $nameController = ucfirst($module) . '\Controller\\Api' . ucfirst($name);
+        $namespaceController = ucfirst($module) . '\Controller\\Api' . ucfirst($name) . "Controller";
+
+        // add array of controller invokables
+        $moduleConfig['controllers']['invokables'][$nameController] = $namespaceController;
+
+        // add array of controller router APIRest
+        $moduleConfig['router']['routes'][$nameController] = array(
+                'type' => 'Zend\Mvc\Router\Http\Segment',
+                'options' => array(
+                    'route'    => '/Api/' . ucfirst($name) . '[/][/:id]',
+                    'constraints' => array(
+                        'id'     => '[0-9]*',
+                    ),
+                    'defaults' => array(
+                        'controller' => $nameController,
+                    ),
+                ),
+        );
+
+        if ($view) {
+            $nameControllerView = ucfirst($module) . '\Controller\\View' . ucfirst($name);
+            $namespaceControllerView = ucfirst($module) . '\Controller\\View' . ucfirst($name) . "Controller";
+
+            // add array of controller invokables
+            $moduleConfig['controllers']['invokables'][$nameControllerView] = $namespaceControllerView;
+
+            // add array of controller router View
+            $moduleConfig['router']['routes'][$nameControllerView] = array(
+                    'type' => 'Zend\Mvc\Router\Http\Segment',
+                    'options' => array(
+                        'route'    => '/' . ucfirst($name) . '[/][:action][/:id]',
+                        'constraints' => array(
+                            'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            'action'     => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            'id'     => '[0-9]*',
+                        ),
+                        'defaults' => array(
+                            'controller' => $nameControllerView,
+                            'action'     => 'index',
+                        ),
+                    ),
+            );
+        }
+
+        // add array of view option ViewJson
+        $moduleConfig['view_manager']['strategies'] = array('ViewJsonStrategy');
+
+        $conteudo = self::$head;
         $conteudo .= "return " . Skeleton::exportConfig($moduleConfig, 2) . ";";
 
         return file_put_contents("$path/module/$module/config/module.config.php", $conteudo);
