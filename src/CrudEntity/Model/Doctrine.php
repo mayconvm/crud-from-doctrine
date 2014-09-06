@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudEntity;
+namespace CrudEntity\Model;
 
 class Doctrine
 {
