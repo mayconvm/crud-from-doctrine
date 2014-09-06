@@ -9,13 +9,14 @@ return array(
     'controllers' => array(
         'invokables' => array(
             'CrudEntity\Controller\ApiRest'      => 'CrudEntity\Controller\ApiRestController',
+            'CrudEntity\Controller\FormValidate'      => 'CrudEntity\Controller\FormValidateController',
         ),
     ),
 
     'console' => array(
         'router' => array(
             'routes' => array(
-                
+
                 'apiRest' => array(
                     'options' => array(
                         'route'    => 'create apirest <name> <modulo> [<path>]',
@@ -28,9 +29,9 @@ return array(
 
                 'formValidateForEntity' => array(
                     'options' => array(
-                        'route'    => 'create form-validate-entity <name> <modulo> <entidade> [<path>]',
+                        'route'    => 'create apirest-and-view <name> <module> <entity> [<path>]',
                         'defaults' => array(
-                            'controller' => 'CrudEntity\Controller\ApiRest',
+                            'controller' => 'CrudEntity\Controller\FormValidate',
                             'action'     => 'apiRestEntity',
                         ),
                     ),
