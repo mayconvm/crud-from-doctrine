@@ -1,6 +1,6 @@
 <?php
 
-namespace CrudEntity\Form\Doctrine;
+namespace CrudEntity\Model\Form\Doctrine;
 
 class Type
 {
@@ -9,7 +9,7 @@ class Type
      * @param  string $type Tipo do campo no banco
      * @return strin       Tipo do input
      */
-    private static function convertTypeDoctrine($type)
+    public static function convertTypeDoctrine($type)
     {
         switch($type)
         {
