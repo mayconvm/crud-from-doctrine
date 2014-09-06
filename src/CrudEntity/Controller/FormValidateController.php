@@ -14,31 +14,47 @@ use CrudEntity\Model\Config as ModelConfig;
 use CrudEntity\Model\Form as ModelForm;
 use CrudEntity\Model\Validate as ModelValidate;
 use CrudEntity\Model\Doctrine as ModelDoctrine;
-use CrudEntity\Model\Form\Doctrine\Type as ModelType;
+use CrudEntity\Model\Form\Doctrine\ArrayForm;
 
 class FormValidateController extends AbstractActionController
 {
 
+    private $console;
+
     public function apiRestEntityAction()
     {
-        $console = $this->getServiceLocator()->get('console');
+        $this->console = $this->getServiceLocator()->get('console');
         $tmpDir  = sys_get_temp_dir();
         $request = $this->getRequest();
         $name    = $request->getParam('name');
         $module  = $request->getParam('module');
         $entity  = $request->getParam('entity');
         $path    = $request->getParam('path', '.');
+        $doctrine = $this->getServiceLocator()->get("Doctrine\ORM\EntityManager");
+
+        $modelController = new ModelController($name, $module, $path);
+        $ucName = ucfirst($name);
 
         // criar o controller para apirest
-        $this->createApiRestController($console);
+        $modelController->setName("Api" . $name);
+        $this->createApiRestController('API', $modelController);
+
+        // create controller view
+        $modelController->setName($name);
+        $this->createApiRestController('VIEW', $modelController);
+
+        // gerando o arquivo de configurações
+        ModelConfig::generateConfig($module, $name, true, $path);
+        $this->console->write("Configuration file regenerate!\n", Color::GREEN);
 
         // buscar a entidade e gerar o array para passar para os metodos que cuidam de gerar os inputs
         $arrayEntity = ModelDoctrine::readEntity($doctrine, $entity);
-        $arrayInputs = $this->entityToForm($arrayEntity);
+        $arrayInputs = ArrayForm::entityToForm($arrayEntity);
 
         // create class form
-        $this->generateForm($name);
+        $this->generateForm($name, $module, $arrayInputs, $path);
 
+        die("okkk");
         // create class validate
 
         // criar o controller para view
@@ -48,72 +64,80 @@ class FormValidateController extends AbstractActionController
         return new ViewModel();
     }
 
-    private function generateForm($name, $module, $elements)
+    /**
+     * Method for generate class form
+     * @param  string $name     Name form
+     * @param  string $module   name module
+     * @param  array $elements Array of elements inputs
+     * @param  string $path path module
+     * @return void
+     */
+    private function generateForm($name, $module, array $elements, $path)
     {
         $namespace = ucfirst($module) . '\Form\\' . ucfirst($name) . 'Form';
-        $modelForm = new ModelForm($name, $namespace);
+        $modelForm = new ModelForm($name, $module, $path);
 
         // Gerando os formulário
         foreach ($elements as $element) {
-            $form->addElement($element['name'], $element['type'], $element['option']);
+            $modelForm->addElement($element['name'], $element['type'], $element['option']);
         }
+
+        // generate class form
+        $modelForm->generate();
     }
 
     /**
-     * Método para gerar um array com as configurações do input, extraindo os dados da entidade
-     * @param  array  $inputs Array com os dados extraidos do annotations do doctrine
-     * @return array         Array de inputs extraido do campos
+     * Método par gera o validador do formulário
+     * @param  string $namespace namespace do validador
+     * @param  string $name      Nome da classe
+     * @param  string $module    Modulo da classe
+     * @param  array $elements  Array de inputs
+     * @param  string $path      Caminho dos arquivos
+     * @return void
      */
-    private function entityToForm(array $inputs)
+    protected function generateValidate($namespace, $name, $module, $elements, $path)
     {
-        $elements = array();
+        $namespaceValidate = $namespace . '\Validate';
+        $validate = new GeneratorValidate($name, $namespaceValidate);
 
-        foreach ($inputs as $input) {
-            $elements[] = array(
-                'name' => $input['fieldName'],
-                'type' => ModelType::convertTypeDoctrine($input['type']),
-                'required' => $input['nullable'],
-                'attributes' => array(
-                    'id' => $input['fieldName'],
-                ),
-                'option' => array(
-                    'label' => $input['fieldName'],
-                ),
-                'filters'  => array(
-                     array('name' => 'StripTags'),
-                     array('name' => 'StringTrim'),
-                 ),
-                'validators' => array(
-                     array(
-                         'name'    => 'StringLength',
-                         'options' => array(
-                             'encoding' => 'UTF-8',
-                             'min'      => 1,
-                             'max'      => $input['length']?: 255,
-                         ),
-                     ),
-                 ),
-            );
+        foreach ($elements as $element) {
+            $validate->addElement($element['name'], $element);
         }
 
-        return $elements;
+        // Gerando os validatores
+        $pathValidate = "$path/module/{$module}/src/{$module}/Validate/";
+        $pathFileValidate = $pathValidate . ucfirst($name). "Validate.php";
+
+        // cria a pasta form
+        @mkdir($pathValidate, 0775, true);
+        file_put_contents($pathFileValidate, $validate->generate());
     }
 
 
-    private function createApiRestController($typeController, $console)
+    private function createApiRestController($typeController, $modelController)
     {
          // generate controller
-        $modelController = new ModelController($name, $module, $path);
         $methods = array();
 
+        // clear all methods
+        $modelController->removeAllMethods();
+
         if ($typeController == "API") {
+
             $methods = $this->methodsControllerApi();
+            $modelController->getGenerator()->addUse('Zend\Mvc\Controller\AbstractRestfulController');
+            $modelController->getGenerator()->setExtendedClass('AbstractRestfulController');
+
         } elseif ($typeController == "VIEW") {
+
             $methods = $this->methodsControllerView();
+            $modelController->getGenerator()->addUse('Zend\View\Model\ViewModel');
+            $modelController->getGenerator()->addUse('Zend\Mvc\Controller\AbstractActionController');
+            $modelController->getGenerator()->setExtendedClass('AbstractActionController');
         }
 
         // Adiciona metodos do controller
-        $modelController->addMehtods($methods);
+        $modelController->addMethods($methods);
             // add input form
             // add validation form
 
@@ -121,28 +145,24 @@ class FormValidateController extends AbstractActionController
         // valida se o controller existe antes de criar
         if ($modelController->isControllerExist()) {
             // pergunta ao usuário
-            $console->write("File exist, really want to delete?: ");
-            $read = $console->readChar('yn');
+            $this->console->write("File " . $modelController->getName() . " exist, really want to delete?: ");
+            $read = $this->console->readChar('yn');
 
 
             if ($read == "n") {
-                $console->write("n\n", Color::RED);
-                $console->write("Controller was not created.\n", Color::RED);
+                $this->console->write("n\n", Color::RED);
+                $this->console->write("Controller was not created.\n", Color::RED);
                 return;
             }
 
-            $console->write("y\n", Color::GREEN);
+            $this->console->write("y\n", Color::GREEN);
         }
 
         // generate class
         $modelController->generate();
 
         // echo text
-        $console->write("Controller create success!\n", Color::GREEN);
-
-        // gerando o arquivo de configurações
-        ModelConfig::generateConfig($module, $name, true, $path);
-        $console->write("Configuration file regenerate!\n", Color::GREEN);
+        $this->console->write("Controller create success!\n", Color::GREEN);
     }
 
     /**
@@ -204,28 +224,28 @@ class FormValidateController extends AbstractActionController
                 'index',
                 array(),
                 Generator\MethodGenerator::FLAG_PUBLIC,
-                'return new JsonModel();'
+                'return new ViewModel();'
             ),
             // method getList
             new Generator\MethodGenerator(
                 'list',
                 array(),
                 Generator\MethodGenerator::FLAG_PUBLIC,
-                'return new JsonModel();'
+                'return new ViewModel();'
             ),
             // method create
             new Generator\MethodGenerator(
                 'create',
                 array(),
                 Generator\MethodGenerator::FLAG_PUBLIC,
-                'return new JsonModel();'
+                'return new ViewModel();'
             ),
             // method update
             new Generator\MethodGenerator(
                 'edit',
                 array(),
                 Generator\MethodGenerator::FLAG_PUBLIC,
-                'return new JsonModel();'
+                'return new ViewModel();'
             )
         );
     }
