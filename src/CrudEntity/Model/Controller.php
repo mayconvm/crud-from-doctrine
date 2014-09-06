@@ -79,6 +79,21 @@ class Controller
         $this->setName($name);
         $this->setModule($module);
         $this->setpath($path);
+
+        $this->removeAllMethods();
+    }
+
+    /**
+     * Method remove all methods
+     * @return void
+     */
+    private function removeAllMethods()
+    {
+        $methodsExist = $this->generator->getMethods();
+
+        foreach ($methodsExist as $method) {
+            $this->generator->removeMethod($method);
+        }
     }
 
     /**
