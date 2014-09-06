@@ -50,23 +50,47 @@ class Controller
      */
     public function __construct($name, $module, $path)
     {
-        $this->setpath($path);
-        $this->setModule($module);
-        $this->setName($name);
+        $this->setPathFull($name, $module, $path);
 
         $ucName     = ucfirst($this->name);
-        $this->pathFull   = $this->path . '/module/' . $this->module . '/src/' . $this->module . '/Controller/' . $ucName.'Controller.php';
+        $ucModule = ucfirst($this->module);
+
         $controller = $ucName . 'Controller';
 
         // Gerar um controller com a classe abstrata de webservice
         $this->generator = new Generator\ClassGenerator();
-        $this->generator->setNamespaceName(ucfirst($this->module) . '\Controller')
+        $this->generator->setNamespaceName($ucModule . '\Controller')
              ->addUse('Zend\Mvc\Controller\AbstractRestfulController')
              ->addUse('Zend\View\Model\JsonModel');
 
         // adicionar os métodos get, getlist, create, update, delete
         $this->generator->setName($controller)
              ->setExtendedClass('AbstractRestfulController');
+    }
+
+    /**
+     * Méthod set full path
+     * @param string $name   Name file
+     * @param string $module name module
+     * @param string $path   path module
+     */
+    protected function setPathFull($name, $module, $path)
+    {
+        $this->setName($name);
+        $this->setModule($module);
+        $this->setpath($path);
+    }
+
+    /**
+     * Method get full path
+     * @return string Full path
+     */
+    protected function getPathFull()
+    {
+        $ucName = ucfirst($this->name);
+        $ucModule = ucfirst($this->module);
+
+        return $this->path . '/module/' . $ucModule . '/src/' . $ucModule . '/Controller/' . $ucName.'Controller.php';
     }
 
     /**
@@ -78,9 +102,7 @@ class Controller
      */
     public function generate($name = null, $module = null, $path = null)
     {
-        $this->setpath($path);
-        $this->setModule($module);
-        $this->setName($name);
+        $this->setPathFull($name, $module, $path);
 
         $this->generator->addmethods($this->arrayMethods);
 
@@ -90,10 +112,7 @@ class Controller
             )
         );
 
-        $filter = new CamelCaseToDashFilter();
-        $viewfolder = strtolower($filter->filter($this->module));
-
-        return file_put_contents($this->pathFull, $file->generate());
+        return file_put_contents($this->getPathFull(), $file->generate());
     }
 
     /**
@@ -126,7 +145,7 @@ class Controller
             return;
         }
 
-        if (file_exists($this->path."/module/" . ucfirst($this->module) ."/src/" . ucfirst($this->module) . "/Controller/" . ucfirst($name) . "Controller.php")) {
+        if (file_exists($this->path."/module/" . ucfirst($this->module) ."/src/" . ucfirst($this->module) . "/Controller/" . ucfirst($this->name) . "Controller.php")) {
             $this->fileExist = true;
         }
 
