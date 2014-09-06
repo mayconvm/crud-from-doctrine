@@ -38,6 +38,11 @@ class Controller
     private $generator;
 
     /**
+     * @var boolean
+     */
+    private $fileExist = false;
+
+    /**
      * Método construtor
      * @param string $name   Nome da API
      * @param string $module Nome do módulo
@@ -110,8 +115,8 @@ class Controller
             return;
         }
 
-        if (file_exists($this->path."/module/" . $this->module."/src/" . $this->module. "/Controller/$name")) {
-            throw new \Exception("O controller $name já existe no módulo " . $this->module);
+        if (file_exists($this->path."/module/" . ucfirst($this->module) ."/src/" . ucfirst($this->module) . "/Controller/" . ucfirst($name) . "Controller.php")) {
+            $this->fileExist = true;
         }
 
         $this->name = $name;
@@ -145,5 +150,14 @@ class Controller
         }
 
         $this->path = $path;
+    }
+
+    /**
+     * Method for valid file exist
+     * @return boolean If any file
+     */
+    public function isControllerExist()
+    {
+        return $this->fileExist;
     }
 }
