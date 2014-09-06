@@ -78,10 +78,30 @@ class ApiRestController extends AbstractActionController
             )
         );
 
+        // valida se o controller existe antes de criar
+        if ($modelController->isControllerExist()) {
+            // pergunta ao usuário
+            $console->write("File exist, really want to delete?: ");
+            $read = $console->readChar('yn');
+
+
+            if ($read == "n") {
+                $console->write("n\n", Color::RED);
+                $console->write("Controller was not created.\n", Color::RED);
+                return;
+            }
+
+            $console->write("y\n", Color::GREEN);
+        }
+
         // generate class
         $modelController->generate();
 
+        // echo text
+        $console->write("Controller create success!\n", Color::GREEN);
+
         // gerando o arquivo de configurações
         ModelConfig::generateConfig($module, $path);
+        $console->write("Configuration file regenerate!\n", Color::GREEN);
     }
 }
