@@ -67,7 +67,15 @@ class Controller
         // adicionar os métodos get, getlist, create, update, delete
         $this->generator->setName($controller)
              ->setExtendedClass('AbstractRestfulController');
+    }
 
+    /**
+     * Method get class 'ClassGenerator'
+     * @return CrudEntity\Model\Generator\ClassGenerator
+     */
+    public function getGenerator()
+    {
+        return $this->generator;
     }
 
     /**
