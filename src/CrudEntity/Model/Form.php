@@ -129,11 +129,11 @@ ELEMENT_FORM;
 
         // cria o arquivo de formulário
         $pathForm = $this->path . "/module/{$ucModule}/src/{$ucModule}/Form/";
-        $pathFileForm = $pathForm . ucfirst($name). "Form.php";
+        $pathFileForm = $pathForm . ucfirst($this->name). "Form.php";
 
         // // cria a pasta form
         @mkdir($pathForm, 0775, true);
-        file_put_contents($pathFileForm, $form->generate());
+        file_put_contents($pathFileForm, $fileGenerator->generate());
 
         return $fileGenerator->generate();
     }
