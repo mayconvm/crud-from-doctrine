@@ -60,8 +60,8 @@ EOD;
         );
 
         if ($view) {
-            $nameControllerView = ucfirst($module) . '\Controller\\View' . ucfirst($name);
-            $namespaceControllerView = ucfirst($module) . '\Controller\\View' . ucfirst($name) . "Controller";
+            $nameControllerView = ucfirst($module) . '\Controller\\' . ucfirst($name);
+            $namespaceControllerView = ucfirst($module) . '\Controller\\' . ucfirst($name) . "Controller";
 
             // add array of controller invokables
             $moduleConfig['controllers']['invokables'][$nameControllerView] = $namespaceControllerView;
