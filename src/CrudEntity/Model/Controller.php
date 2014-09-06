@@ -4,6 +4,7 @@ namespace CrudEntity\Model;
 
 use Zend\Code\Generator;
 use Zend\Filter\Word\CamelCaseToDash as CamelCaseToDashFilter;
+use CrudEntity\Model\Generator\ClassGenerator;
 
 class Controller
 {
@@ -33,7 +34,7 @@ class Controller
     private $arrayMethods;
 
     /**
-     * @var Generator\ClassGenerator
+     * @var ClassGenerator
      */
     private $generator;
 
@@ -50,15 +51,15 @@ class Controller
      */
     public function __construct($name, $module, $path)
     {
+        $this->generator = new ClassGenerator();
+
         $this->setPathFull($name, $module, $path);
 
         $ucName     = ucfirst($this->name);
         $ucModule = ucfirst($this->module);
-
         $controller = $ucName . 'Controller';
 
         // Gerar um controller com a classe abstrata de webservice
-        $this->generator = new Generator\ClassGenerator();
         $this->generator->setNamespaceName($ucModule . '\Controller')
              ->addUse('Zend\Mvc\Controller\AbstractRestfulController')
              ->addUse('Zend\View\Model\JsonModel');
@@ -66,6 +67,7 @@ class Controller
         // adicionar os métodos get, getlist, create, update, delete
         $this->generator->setName($controller)
              ->setExtendedClass('AbstractRestfulController');
+
     }
 
     /**
@@ -87,13 +89,10 @@ class Controller
      * Method remove all methods
      * @return void
      */
-    private function removeAllMethods()
+    public function removeAllMethods()
     {
-        $methodsExist = $this->generator->getMethods();
-
-        foreach ($methodsExist as $method) {
-            $this->generator->removeMethod($method);
-        }
+        $this->generator->removeAllMethods();
+        $this->arrayMethods = array();
     }
 
     /**
@@ -110,15 +109,10 @@ class Controller
 
     /**
      * Método para gerar o controller
-     * @param  string $name   Nome do controller
-     * @param  string $module Nome do Módulo
-     * @param  string $path   Caminho dos arquivos
      * @return void
      */
-    public function generate($name = null, $module = null, $path = null)
+    public function generate()
     {
-        $this->setPathFull($name, $module, $path);
-
         $this->generator->addmethods($this->arrayMethods);
 
         $file = new Generator\FileGenerator(
