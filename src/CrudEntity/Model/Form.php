@@ -17,23 +17,49 @@ class Form
     );
 
     /**
+     * @var string
+     */
+    private $name;
+
+
+    /**
+     * @var string
+     */
+    private $module;
+
+    /**
      * Método construtor da classe
      * @param string $name      Nome do formulário
      * @param string $namesapce NameSpace do formulário
      * @param string $path      Caminho para o arquivo ser gerado
      * @param array $options      Opções do formulário
      */
-    public function __construct($name, $namesapce, $options)
+    public function __construct($name, $module, $path, $options = array())
     {
+        $this->setPath($path);
+        $this->setModule($module);
+        $this->setName($name);
+
+        $namesapce = ucfirst($this->module) . "\Form";
+
         // $fileReflection  = new Reflection\FileReflection($path . "/" . $name . ".php", true);
         // $classReflection = $fileReflection->getClass($name."Form");
         $this->classGenerator = new Generator\ClassGenerator();
         $this->classGenerator->addUse('Zend\Form\Form')
                             ->setExtendedClass('Form')
                             ->setNamespaceName($namesapce)
-                            ->setName($name."Form");
+                            ->setName(ucfirst($this->name)."Form");
 
-        $this->options = $options;
+        $this->setOptions($options);
+    }
+
+    /**
+     * Method set options
+     * @param array $options
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array_merge($options, $this->options);
     }
 
     /**
@@ -99,13 +125,15 @@ ELEMENT_FORM;
             )
         );
 
+        $ucModule = ucfirst($this->module);
+
         // cria o arquivo de formulário
-        // $pathForm = "$path/module/{$module}/src/{$module}/Form/";
-        // $pathFileForm = $pathForm . ucfirst($name). "Form.php";
+        $pathForm = $this->path . "/module/{$ucModule}/src/{$ucModule}/Form/";
+        $pathFileForm = $pathForm . ucfirst($name). "Form.php";
 
         // // cria a pasta form
-        // @mkdir($pathForm, 0775, true);
-        // file_put_contents($pathFileForm, $form->generate());
+        @mkdir($pathForm, 0775, true);
+        file_put_contents($pathFileForm, $form->generate());
 
         return $fileGenerator->generate();
     }
@@ -142,5 +170,61 @@ ELEMENT_FORM;
                 break;
 
         }
+    }
+
+    /**
+     * Método para setar o nome do controller
+     * @param string $name Nome
+     */
+    public function setName($name)
+    {
+        if (empty($name)) {
+            return;
+        }
+
+        if (file_exists($this->path."/module/" . ucfirst($this->module) ."/src/" . ucfirst($this->module) . "/Form/" . ucfirst($name) . "Form.php")) {
+            $this->fileExist = true;
+        }
+
+        $this->name = $name;
+    }
+
+    /**
+     * Método para setar o módulo do controller
+     * @param string $module Nome do módulo
+     */
+    public function setModule($module)
+    {
+        if (empty($module)) {
+            return;
+        }
+
+        if (!file_exists($this->path."/module") || !file_exists($this->path."/config/application.config.php")) {
+            throw new \Exception("O diretório " . $this->path . " não é um módulo ZF2.");
+        }
+
+        $this->module = $module;
+    }
+
+    /**
+     * Método para setar o caminho do módulo
+     * @param string $path Caminho do módulo
+     */
+    public function setPath($path = ".")
+    {
+        if (empty($path)) {
+            return;
+        }
+
+        $this->path = $path;
+    }
+
+    /**
+     * Method for valid file exist
+     * @return boolean If any file
+     */
+    public function isFormExist()
+    {
+        return $this->fileExist;
     }
 }
