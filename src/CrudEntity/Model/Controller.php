@@ -172,6 +172,10 @@ class Controller
         return $this->fileExist;
     }
 
+    /**
+     * Method return nem class
+     * @return string name class
+     */
     public function getName()
     {
         return $this->name;
