@@ -12,7 +12,9 @@ class Form
 
     private $element;
 
-    private $options;
+    private $options = array(
+        'method' => 'POST'
+    );
 
     /**
      * Método construtor da classe
@@ -97,6 +99,14 @@ ELEMENT_FORM;
             )
         );
 
+        // cria o arquivo de formulário
+        // $pathForm = "$path/module/{$module}/src/{$module}/Form/";
+        // $pathFileForm = $pathForm . ucfirst($name). "Form.php";
+
+        // // cria a pasta form
+        // @mkdir($pathForm, 0775, true);
+        // file_put_contents($pathFileForm, $form->generate());
+
         return $fileGenerator->generate();
     }
 
@@ -111,9 +121,6 @@ ELEMENT_FORM;
         {
             case 'text':
                 return 'Zend\Form\Element\Text';
-                break;
-            case 'radio':
-                return 'Zend\Form\Element\Radio';
                 break;
             case 'password':
                 return 'Zend\Form\Element\password';
