@@ -8,7 +8,7 @@ The CrudFromDoctrine is a utility generate code for Zend Framework 2.
 * Create new Controller
 * Create new Controlle APIRest
 * Create new Form based in Doctrine entity
-* Create new Validate for Form based in Doctrine entity
+* Create new Validator for Form based in Doctrine entity
 
 ## Requiriments
 
@@ -31,3 +31,12 @@ The CrudFromDoctrine is a utility generate code for Zend Framework 2.
   <name>    The name of the controller
   <module>  The name of the module
   <path>    The path to folder of the ZF2 application (optional)
+
+## TODO
+
+* Create new validator for Form
+* Create folder Model
+* Create new Model
+* Create layout for Form based in [Bootstrap](http://getbootstrap.com/)
+* Create layout for inputs of Form based in [Bootstrap](http://getbootstrap.com/)
+
